@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinkedIn Focus Settings</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>LinkedIn Focus</h1>
+      <p class="subtitle">Settings</p>
+    </header>
+
+    <div class="section">
+      <h2>Daily Access Window</h2>
+      <p class="description">Select the hour you want to allow access (1 hour duration).</p>
+      <div class="form-group">
+        <label for="startTime">Start Time:</label>
+        <input type="time" id="startTime" />
+      </div>
+      <div id="statusMessage" class="status"></div>
+    </div>
+
+    <div class="section">
+      <h2>AI Configuration</h2>
+      <p class="description">Enter your API Key for grammar suggestions.</p>
+      <div class="form-group">
+        <label for="apiKey">API Key (OpenAI/Gemini):</label>
+        <input type="password" id="apiKey" placeholder="Enter API Key..." />
+      </div>
+    </div>
+
+    <button id="saveBtn">Save Settings</button>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
