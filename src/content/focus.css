@@ -1,0 +1,51 @@
+/* src/content/focus.css */
+
+/* Hide the Main Feed */
+.scaffold-layout__main > div:not(.profile-view-grid):not(.scaffold-layout__content--has-sidebar),
+aside.scaffold-layout__aside,
+.feed-shared-update-v2, 
+#feed-container,
+main#main,
+div[role="main"] > div:not(.profile-view-grid) {
+    display: none !important;
+}
+
+/* Hide Jobs Tab Content if accessible */
+.jobs-home-jobs-list,
+.jobs-search-results-list {
+    display: none !important;
+}
+
+/* Hide Notification Badges */
+.notification-badge,
+.nav-item__badge {
+    display: none !important;
+}
+
+/* Hide Messaging Tab (bottom right) */
+.msg-overlay-list-bubble,
+.msg-overlay-bubble-header {
+    display: none !important;
+}
+
+/* Hide Ads */
+.ad-banner, 
+.ad-banner-container {
+    display: none !important;
+}
+
+/* Add a visual indicator that Focus Mode is ON */
+body::after {
+    content: "FOCUS MODE ENABLED";
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: #0a66c2;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    z-index: 999999;
+    opacity: 0.7;
+    pointer-events: none;
+}

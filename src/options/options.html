@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinkedIn Focus Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>LinkedIn Focus Settings</h1>
+    </header>
+
+    <div class="section">
+      <h2>Time Management</h2>
+      <p class="description">Configure your 1-hour daily access window.</p>
+      
+      <div class="form-group">
+        <label for="startTime">Daily Start Time:</label>
+        <input type="time" id="startTime" />
+      </div>
+
+      <div class="form-group">
+        <label>When time limit is exceeded:</label>
+        <div class="radio-group">
+          <label class="radio-label">
+            <input type="radio" name="timeoutAction" value="block" checked>
+            Block Page Completely
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="timeoutAction" value="focus">
+            Enable Focus Mode (Hide Feed/Jobs)
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Focus Mode</h2>
+      <p class="description">Remove distractions like the Feed, Jobs, and Notifications.</p>
+      
+      <div class="form-group row">
+        <label class="switch">
+          <input type="checkbox" id="alwaysFocus">
+          <span class="slider round"></span>
+        </label>
+        <span>Always Enable Focus Mode</span>
+      </div>
+      <p class="note">If checked, the feed is always hidden regardless of time.</p>
+    </div>
+
+    <div class="section">
+      <h2>AI Grammar Helper</h2>
+      <p class="description">Configure the Grammar Checker API (LanguageTool compatible).</p>
+      
+      <div class="form-group">
+        <label for="apiUrl">API Endpoint (Optional):</label>
+        <input type="text" id="apiUrl" value="https://api.languagetool.org/v2/check" placeholder="https://api.languagetool.org/v2/check" />
+      </div>
+      
+      <div class="form-group">
+        <label for="apiKey">API Key / Username (Optional):</label>
+        <input type="password" id="apiKey" placeholder="Leave empty for free endpoint" />
+        <p class="note">Use a generic key or username if required by your endpoint.</p>
+      </div>
+    </div>
+
+    <button id="saveBtn">Save All Settings</button>
+    <div id="statusMessage" class="status"></div>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>
