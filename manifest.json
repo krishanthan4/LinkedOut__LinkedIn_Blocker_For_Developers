@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "LinkedIn Focus & LeetCode Gate",
+  "name": "LinkedOut - LinkedIn Focus Extension for Developers",
   "version": "1.0",
   "description": "Limits LinkedIn usage, forces LeetCode solving for profile views, and provides AI grammar support.",
   "permissions": [
