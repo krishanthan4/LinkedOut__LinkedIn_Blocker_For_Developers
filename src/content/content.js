@@ -1,5 +1,3 @@
-// src/content/content.js
-
 // --- Global State ---
 let isLocked = true;
 let currentUrl = location.href;
@@ -32,7 +30,7 @@ chrome.storage.sync.get(['alwaysFocus'], (data) => {
 chrome.runtime.onMessage.addListener((request) => {
   if (request.action === 'ENABLE_FOCUS_MODE') {
     toggleFocusMode(true);
-  } else if (request.action === 'DISABLE_FOCUS_MODE') { 
+  } else if (request.action === 'DISABLE_FOCUS_MODE') {
     toggleFocusMode(false);
   }
 });
@@ -44,10 +42,10 @@ function isProfilePage(url) {
 }
 
 function isOwnProfile() {
-  const analyticsSection = document.querySelector('.pvs-header__title'); 
+  const analyticsSection = document.querySelector('.pvs-header__title');
   const buttons = Array.from(document.querySelectorAll('button'));
   const hasMessageButton = buttons.some(b => b.innerText && b.innerText.trim() === 'Message');
-  return !hasMessageButton; 
+  return !hasMessageButton;
 }
 
 // --- LeetCode Logic (Real) ---
@@ -56,7 +54,7 @@ function createOverlay() {
 
   const overlay = document.createElement('div');
   overlay.id = 'leetcode-gate-overlay';
-  
+
   overlay.innerHTML = `
     <div id="leetcode-gate-modal">
       <h2>🔒 Profile Locked</h2>
@@ -74,16 +72,11 @@ function createOverlay() {
   `;
 
   document.body.appendChild(overlay);
-  document.body.style.overflow = 'hidden'; 
+  document.body.style.overflow = 'hidden';
 
   document.getElementById('solve-btn').addEventListener('click', () => {
-    // Open LeetCode Problemset, user chooses? Or we pick one.
-    // User requested "Allow user to select" in a previous turn, OR we pick.
-    // BUT user also said "Solve a NEW leetcode problem, not previously solved".
-    // Hard to ensure "New" if we pick a random URL that matches.
-    // Best bet: Open the Problemset page with 'Status: Todo' filter?
     const problemUrl = "https://leetcode.com/problemset/";
-    
+
     window.open(problemUrl, "LeetCodeChallenge", "width=1000,height=800");
   });
 }
@@ -147,15 +140,15 @@ function addAIButton(inputField) {
   const rect = inputField.getBoundingClientRect();
   const btn = document.createElement('button');
   btn.className = 'ai-helper-btn';
-  btn.innerText = '✨'; 
-  
+  btn.innerText = '✨';
+
   const top = rect.top + window.scrollY - 20;
   const left = rect.right + window.scrollX - 40;
-  
+
   btn.style.top = top + 'px';
   btn.style.left = left + 'px';
   btn.style.position = 'absolute';
-  
+
   btn.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -174,7 +167,7 @@ function showAISuggestions(inputField, btnBtn) {
 
   chrome.runtime.sendMessage({ action: 'ANALYZE_TEXT', text: text }, (response) => {
     btnBtn.innerText = originalEmoji;
-    
+
     if (chrome.runtime.lastError) {
       alert("Error: " + chrome.runtime.lastError.message);
       return;
@@ -197,7 +190,7 @@ function createMsgPopup(inputField, btnBtn, suggestions) {
 
   const popup = document.createElement('div');
   popup.className = 'ai-helper-popup';
-  
+
   const btnRect = btnBtn.getBoundingClientRect();
   popup.style.top = (window.scrollY + btnRect.bottom + 5) + 'px';
   popup.style.left = (window.scrollX + btnRect.left) + 'px';
@@ -207,13 +200,8 @@ function createMsgPopup(inputField, btnBtn, suggestions) {
     div.className = 'ai-suggestion';
     div.innerText = sugg;
     div.addEventListener('click', () => {
-      // LT API returns specific replacements for errors.
-      // If the suggestion is just an error message, we can't auto-replace usually?
-      // But let's assume if it's not a sentence, we replace?
-      // Or just append?
-      // For simple LT use, usually it gives corrections.
       if (inputField.tagName === 'INPUT' || inputField.tagName === 'TEXTAREA') {
-        inputField.value = sugg; 
+        inputField.value = sugg;
       } else {
         inputField.innerText = sugg;
       }

@@ -1,5 +1,3 @@
-/* src/content/focus.css */
-
 /* Hide the Main Feed */
 .scaffold-layout__main > div:not(.profile-view-grid):not(.scaffold-layout__content--has-sidebar),
 aside.scaffold-layout__aside,
