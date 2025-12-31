@@ -2,6 +2,11 @@
 
 **Turn your LinkedIn distraction into coding progression.**
 
+<img width="1280" height="800" alt="1" src="https://github.com/user-attachments/assets/a4fea877-cf19-4b80-a003-aa34e9cb3de8" />
+
+<img width="1280" height="800" alt="4" src="https://github.com/user-attachments/assets/9049483b-8515-4347-b0e4-cbf1fe8d967c" />
+
+
 LinkedOut is a browser extension for developers who find themselves doomscrolling "I'm humbled to announce" posts instead of shipping code. It puts a gatekeeper on your professional networking: if you want to access LinkedIn, you have to solve a LeetCode problem first.
 
 ## The Problem
@@ -52,6 +57,8 @@ We welcome contributions! If you have an idea to make this tool even more rigoro
 ### Development
 1.  Make your changes in `src/`.
 2.  Reload the extension in the browser extensions page to test.
+
+<img width="128" height="128" alt="128x128" src="https://github.com/user-attachments/assets/6e66845c-b07b-457d-b4f2-165e3936652a" />
 
 ## License
 
