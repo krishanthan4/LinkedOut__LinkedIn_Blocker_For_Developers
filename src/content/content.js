@@ -124,7 +124,7 @@ observer.observe(document.body, { childList: true, subtree: true });
 checkAndLock();
 
 
-// --- AI Grammar Logic (Real) ---
+// --- Grammar Logic (Real) ---
 
 document.addEventListener('focusin', (e) => {
   const target = e.target;
@@ -174,7 +174,7 @@ function showAISuggestions(inputField, btnBtn) {
     }
 
     if (response.error) {
-      alert("AI Error: " + response.error);
+      alert("Error: " + response.error);
       return;
     }
 

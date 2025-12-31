@@ -11,7 +11,7 @@
       --bg-dark: #1b1f23;
       --card-bg: #24292e;
       --text-main: #e6edf3;
-      --text-muted: #8b949e;
+      --text-muted: #c0c0c0;
     }
 
     body {
@@ -135,10 +135,33 @@
       background: #444c56;
     }
 
-    #saveBtn {
+    .segmented-control {
+      display: flex;
+      background: #0d1117;
+      border-radius: 6px;
+      padding: 2px;
+      border: 1px solid #30363d;
+    }
+
+    .segmented-control input[type="radio"] {
+      display: none;
+    }
+
+    .segmented-control label {
+      flex: 1;
+      text-align: center;
+      padding: 6px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+    }
+
+    .segmented-control input[type="radio"]:checked + label {
       background: var(--linkedin-blue);
-      border: none;
-      margin-top: 6px;
+      color: white;
+      font-weight: 500;
     }
   </style>
 </head>
@@ -146,53 +169,67 @@
   <div class="container">
     <header>
       <h1>LinkedOut</h1>
+      <p style="font-size: 0.75rem; color: var(--text-muted); font-style: italic; margin-top: 4px;">
+        "Solve a LeetCode a day to keep the 'jobless' away"
+      </p>
     </header>
 
-    <div class="status-card">
-      <div class="status-active">● Extension Active</div>
-      <p style="margin: 2px 0 0; font-size: 0.75rem; color: var(--text-muted);">Focus mode is engaged.</p>
-    </div>
-
     <div class="features">
-      <div class="feature-item li">
+      <div class="feature-item">
         <span>🚫</span>
         <div class="feature-text">
-          <span>Hiding distractions on LinkedIn</span>
+          <span>Less Scrolling</span>
         </div>
       </div>
       <div class="feature-item">
         <span>💡</span>
         <div class="feature-text">
-          <span>Solve LeetCode to unlock feed</span>
+          <span>Solve LeetCode to See Profiles</span>
         </div>
       </div>
     </div>
 
     <div class="section">
-      <h2>Time Management</h2>
+      <h2>Usage Controls</h2>
+      
+      <!-- Usage Mode Selection -->
       <div class="form-group">
-        <label for="startTime">Daily Start Time:</label>
-        <input type="time" id="startTime" style="font-size: 0.8rem; padding: 2px;" />
-      </div>
-
-      <div class="form-group">
-        <div class="radio-group">
-          <label class="radio-label">
-            <input type="radio" name="timeoutAction" value="block">
-            Block Page Completely
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="timeoutAction" value="focus">
-            Enable Focus Mode
-          </label>
+        <label style="margin-bottom: 8px; display: block;">Usage Mode:</label>
+        <div class="segmented-control">
+          <input type="radio" name="usageMode" value="dailyLimit" id="modeDaily" checked>
+          <label for="modeDaily">1 Hour Daily</label>
+          
+          <input type="radio" name="usageMode" value="timeBlock" id="modeScheduled">
+          <label for="modeScheduled">Scheduled Time</label>
         </div>
       </div>
-      <button id="saveBtn" class="btn-secondary">Save Settings</button>
+
+      <!-- Start Time (Hidden by default unless Time Time is selected) -->
+      <div class="form-group" id="startTimeContainer" style="display: none; margin-top: 8px;">
+        <label for="startTime">Daily Start Time (1 Hour):</label>
+        <input type="time" id="startTime" style="font-size: 0.8rem; padding: 4px; width: 100%; box-sizing: border-box; margin-top: 4px;" />
+      </div>
+
+      <div class="divider" style="height: 1px; background: #30363d; margin: 10px 0;"></div>
+
+      <!-- Timeout Action -->
+      <div class="form-group">
+        <label style="margin-bottom: 8px; display: block;">When Time Ends:</label>
+        <div class="segmented-control">
+          <input type="radio" name="timeoutAction" value="block" id="actionBlock" checked>
+          <label for="actionBlock" style="border-right: 1px solid transparent;">Block Page</label>
+          
+          <input type="radio" name="timeoutAction" value="focus" id="actionFocus">
+          <label for="actionFocus">Focus Mode</label>
+        </div>
+      </div>
+
+      <button id="saveBtn" class="btn-secondary" style="margin-top: 10px; background: var(--linkedin-blue); border: none;">Save Settings</button>
       <div id="saveStatus" style="text-align: center; font-size: 0.7rem; color: #3fb950; min-height: 1em; margin-top: 2px;"></div>
     </div>
 
     <button id="optionsBtn" class="btn-secondary">
-      <span>⚙️</span> Open Settings
+      Open Options
     </button>
   </div>
   <script src="popup.js"></script>

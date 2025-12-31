@@ -1,55 +1,259 @@
+// Track active LinkedIn tab and time
+let activeLinkedInTabId = null;
+let trackingStartTime = null;
+
+// Initialize alarms for midnight reset
+chrome.runtime.onInstalled.addListener(() => {
+  setupMidnightAlarm();
+});
+
+function setupMidnightAlarm() {
+  chrome.alarms.create('midnightReset', {
+    when: getNextMidnight(),
+    periodInMinutes: 24 * 60 // Repeat daily
+  });
+}
+
+function getNextMidnight() {
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  return midnight.getTime();
+}
+
+// Handle midnight reset
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'midnightReset') {
+    chrome.storage.local.set({
+      dailyUsage: 0,
+      usageDate: new Date().toDateString()
+    });
+  }
+});
+
+// Track active tab time
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  stopTracking();
+
+  chrome.tabs.get(activeInfo.tabId, (tab) => {
+    if (tab.url && tab.url.includes('linkedin.com')) {
+      startTracking(activeInfo.tabId);
+      checkAccess(activeInfo.tabId, tab.url);
+    }
+  });
+});
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete' && tab.url) {
+    if (tab.url.includes('linkedin.com')) {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0] && tabs[0].id === tabId) {
+          startTracking(tabId);
+        }
+      });
+      checkAccess(tabId, tab.url);
+    }
+  }
+});
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  if (tabId === activeLinkedInTabId) {
+    stopTracking();
+  }
+});
+
+chrome.windows.onFocusChanged.addListener((windowId) => {
+  if (windowId === chrome.windows.WINDOW_ID_NONE) {
+    stopTracking();
+  } else {
+    chrome.tabs.query({ active: true, windowId: windowId }, (tabs) => {
+      if (tabs[0] && tabs[0].url && tabs[0].url.includes('linkedin.com')) {
+        startTracking(tabs[0].id);
+      } else {
+        stopTracking();
+      }
+    });
+  }
+});
+
+function startTracking(tabId) {
+  if (activeLinkedInTabId !== tabId) {
+    stopTracking();
+    activeLinkedInTabId = tabId;
+    trackingStartTime = Date.now();
+  }
+}
+
+function stopTracking() {
+  if (activeLinkedInTabId !== null && trackingStartTime !== null) {
+    const timeSpent = Math.floor((Date.now() - trackingStartTime) / 1000);
+
+    chrome.storage.local.get(['dailyUsage', 'usageDate'], (data) => {
+      const today = new Date().toDateString();
+      let currentUsage = 0;
+
+      if (data.usageDate === today) {
+        currentUsage = data.dailyUsage || 0;
+      }
+
+      chrome.storage.local.set({
+        dailyUsage: currentUsage + timeSpent,
+        usageDate: today
+      });
+    });
+
+    activeLinkedInTabId = null;
+    trackingStartTime = null;
+  }
+}
+
 function checkAccess(tabId, url) {
   if (!url || !url.includes("linkedin.com")) return;
 
-  chrome.storage.sync.get(['allowedStartTime', 'timeoutAction', 'alwaysFocus'], (data) => {
+  chrome.storage.sync.get(['usageMode', 'allowedStartTime', 'timeoutAction', 'alwaysFocus'], (data) => {
     // 1. Check Always Focus
     if (data.alwaysFocus) {
       chrome.tabs.sendMessage(tabId, { action: 'ENABLE_FOCUS_MODE' }).catch(() => { });
     }
 
-    if (!data.allowedStartTime) {
-      return;
+    // Default to dailyLimit mode if not set
+    const usageMode = data.usageMode || 'dailyLimit';
+    const timeoutAction = data.timeoutAction || 'block';
+
+    if (usageMode === 'dailyLimit') {
+      // Daily Limit Mode
+      checkDailyLimit(tabId, timeoutAction);
+    } else if (usageMode === 'timeBlock') {
+      // Time Block Mode
+      if (!data.allowedStartTime) {
+        // If no time is set, don't block (allow full access)
+        return;
+      }
+
+      const now = new Date();
+      const currentHour = now.getHours();
+      const currentMinute = now.getMinutes();
+      const [startHour, startMinute] = data.allowedStartTime.split(':').map(Number);
+      const currentTotalMinutes = currentHour * 60 + currentMinute;
+      const startTotalMinutes = startHour * 60 + startMinute;
+      const endTotalMinutes = startTotalMinutes + 60; // 1 hour window
+
+      const isWithinWindow = currentTotalMinutes >= startTotalMinutes && currentTotalMinutes < endTotalMinutes;
+
+      if (!isWithinWindow) {
+        if (timeoutAction === 'focus') {
+          chrome.tabs.sendMessage(tabId, { action: 'ENABLE_FOCUS_MODE' }).catch(() => { });
+        } else {
+          chrome.tabs.update(tabId, { url: chrome.runtime.getURL("src/blocked.html") });
+        }
+      }
+    }
+  });
+}
+
+
+function checkDailyLimit(tabId, timeoutAction) {
+  chrome.storage.local.get(['dailyUsage', 'usageDate'], (data) => {
+    const today = new Date().toDateString();
+    let usageSeconds = 0;
+
+    if (data.usageDate === today && data.dailyUsage) {
+      usageSeconds = data.dailyUsage;
     }
 
-    const now = new Date();
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
-    const [startHour, startMinute] = data.allowedStartTime.split(':').map(Number);
-    const currentTotalMinutes = currentHour * 60 + currentMinute;
-    const startTotalMinutes = startHour * 60 + startMinute;
-    const endTotalMinutes = startTotalMinutes + 60; // 1 hour window
-
-    const isWithinWindow = currentTotalMinutes >= startTotalMinutes && currentTotalMinutes < endTotalMinutes;
-
-    if (!isWithinWindow) {
-      if (data.timeoutAction === 'focus') {
-        // Enforce Focus Mode instead of blocking
+    // Block if usage exceeds 1 hour (3600 seconds)
+    if (usageSeconds >= 3600) {
+      if (timeoutAction === 'focus') {
         chrome.tabs.sendMessage(tabId, { action: 'ENABLE_FOCUS_MODE' }).catch(() => { });
       } else {
-        // Default: Block
+        stopTracking(); // Stop tracking before redirect
         chrome.tabs.update(tabId, { url: chrome.runtime.getURL("src/blocked.html") });
       }
     }
   });
 }
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === 'complete' && tab.url) {
-    checkAccess(tabId, tab.url);
-  }
-});
+// Update declarativeNetRequest rules based on settings
+function updateBlockingRules() {
+  chrome.storage.sync.get(['usageMode', 'allowedStartTime', 'timeoutAction'], (data) => {
+    // Default to dailyLimit mode if not set
+    const usageMode = data.usageMode || 'dailyLimit';
+    const timeoutAction = data.timeoutAction || 'block';
 
-chrome.tabs.onActivated.addListener((activeInfo) => {
-  chrome.tabs.get(activeInfo.tabId, (tab) => {
-    if (tab.url) {
-      checkAccess(activeInfo.tabId, tab.url);
+    if (usageMode === 'dailyLimit') {
+      checkDailyLimitForRules(timeoutAction);
+    } else if (usageMode === 'timeBlock') {
+      checkTimeBlockForRules(data.allowedStartTime, timeoutAction);
     }
   });
-});
+}
+
+function checkDailyLimitForRules(timeoutAction) {
+  chrome.storage.local.get(['dailyUsage', 'usageDate'], (data) => {
+    const today = new Date().toDateString();
+    let usageSeconds = 0;
+
+    if (data.usageDate === today && data.dailyUsage) {
+      usageSeconds = data.dailyUsage;
+    }
+
+    const shouldBlock = usageSeconds >= 3600 && timeoutAction === 'block';
+    updateRules(shouldBlock);
+  });
+}
+
+function checkTimeBlockForRules(allowedStartTime, timeoutAction) {
+  if (!allowedStartTime || timeoutAction !== 'block') {
+    updateRules(false);
+    return;
+  }
+
+  const now = new Date();
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+  const [startHour, startMinute] = allowedStartTime.split(':').map(Number);
+  const currentTotalMinutes = currentHour * 60 + currentMinute;
+  const startTotalMinutes = startHour * 60 + startMinute;
+  const endTotalMinutes = startTotalMinutes + 60;
+
+  const isWithinWindow = currentTotalMinutes >= startTotalMinutes && currentTotalMinutes < endTotalMinutes;
+  updateRules(!isWithinWindow);
+}
+
+function updateRules(shouldBlock) {
+  const ruleId = 1;
+
+  chrome.declarativeNetRequest.getDynamicRules((existingRules) => {
+    const ruleIds = existingRules.map(rule => rule.id);
+
+    chrome.declarativeNetRequest.updateDynamicRules({
+      removeRuleIds: ruleIds,
+      addRules: shouldBlock ? [{
+        id: ruleId,
+        priority: 1,
+        action: {
+          type: 'redirect',
+          redirect: { url: chrome.runtime.getURL('src/blocked.html') }
+        },
+        condition: {
+          urlFilter: '*://www.linkedin.com/*',
+          resourceTypes: ['main_frame']
+        }
+      }] : []
+    });
+  });
+}
+
+// Update rules periodically (every minute)
+setInterval(updateBlockingRules, 60000);
+
+// Update rules on startup
+updateBlockingRules();
 
 // Update settings listener
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'SETTINGS_UPDATED') {
+    updateBlockingRules();
     // Re-check all LinkedIn tabs
     chrome.tabs.query({ url: "*://www.linkedin.com/*" }, (tabs) => {
       tabs.forEach(tab => checkAccess(tab.id, tab.url));
@@ -70,7 +274,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const text = request.text;
 
     chrome.storage.sync.get(['grammarApiUrl', 'grammarApiKey'], async (data) => {
-      // Default to LanguageTool free endpoint if not set
       const apiUrl = data.grammarApiUrl || 'https://api.languagetool.org/v2/check';
       const apiKey = data.grammarApiKey ? data.grammarApiKey.trim() : null;
 
@@ -78,14 +281,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const bodyParams = new URLSearchParams();
         bodyParams.append('text', text);
         bodyParams.append('language', 'en-US');
-        // But generic API structure requested? Let's assume standard LT format.
-        if (apiKey) {
-          // Some LT enterprise uses 'username' and 'apiKey'. 
-          // For simplicity, we just pass what the user gave if they use a compatible custom server.
-          // Or if they use a different AI API, this might fail.
-          // User asked for "different api key". Let's try to assume a standard JSON POST if it's not LT.
-          // But actually LanguageTool is x-www-form-urlencoded usually.
-        }
 
         const response = await fetch(apiUrl, {
           method: 'POST',

@@ -21,11 +21,32 @@
     <fieldset id="settingsFieldset">
       <div class="section">
         <h2>Time Management</h2>
-        <p class="description">Configure your 1-hour daily access window.</p>
+        <p class="description">Configure how you want to limit your LinkedIn usage.</p>
         
         <div class="form-group">
-          <label for="startTime">Daily Start Time:</label>
-          <input type="time" id="startTime" />
+          <label>Usage Limit Mode:</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="usageMode" value="dailyLimit">
+              Daily Limit (1 hour total per day)
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="usageMode" value="timeBlock" checked>
+              Time Block (1 hour at specific time)
+            </label>
+          </div>
+        </div>
+
+        <div id="timeBlockSettings" style="display: none;">
+          <div class="form-group">
+            <label for="startTime">Daily Start Time:</label>
+            <input type="time" id="startTime" />
+          </div>
+        </div>
+
+        <div id="dailyLimitInfo" class="info-box">
+          <p>📊 Daily Usage: <span id="usageDisplay">0 min / 60 min</span></p>
+          <p class="note">Resets at midnight. Tracks active tab time only.</p>
         </div>
 
         <div class="form-group">
@@ -58,18 +79,12 @@
       </div>
 
       <div class="section">
-        <h2>AI Grammar Helper</h2>
+        <h2>Grammar Helper</h2>
         <p class="description">Configure the Grammar Checker API (LanguageTool compatible).</p>
         
         <div class="form-group">
           <label for="apiUrl">API Endpoint (Optional):</label>
           <input type="text" id="apiUrl" value="https://api.languagetool.org/v2/check" placeholder="https://api.languagetool.org/v2/check" />
-        </div>
-        
-        <div class="form-group">
-          <label for="apiKey">API Key / Username (Optional):</label>
-          <input type="password" id="apiKey" placeholder="Leave empty for free endpoint" />
-          <p class="note">Use a generic key or username if required by your endpoint.</p>
         </div>
       </div>
     </fieldset>

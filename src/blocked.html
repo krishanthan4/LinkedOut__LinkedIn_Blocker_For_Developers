@@ -5,36 +5,128 @@
   <title>LinkedOut - Blocked</title>
   <link rel="shortcut icon" href="icons/icon48.png" type="image/x-icon">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body {
-      background-color: #121212;
+      background: linear-gradient(135deg, #000000 0%, #232323 50%, #343434 100%);
       color: #e0e0e0;
-      font-family: sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-      margin: 0;
+      overflow: hidden;
     }
-    h1 {
-      font-size: 3rem;
-      color: #ff5252;
-    }
-    p {
-      font-size: 1.5rem;
-      max-width: 600px;
+    
+    .container {
       text-align: center;
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      animation: fadeIn 0.6s ease-out;
     }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
     .icon {
       font-size: 5rem;
       margin-bottom: 20px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+    }
+    
+    h1 {
+      font-size: 3rem;
+      color: #ff5252;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      line-height: 1.6;
+      color: #b0b0b0;
+    }
+    
+    .message {
+      font-size: 1.4rem;
+      color: #e0e0e0;
+      margin-bottom: 30px;
+    }
+    
+    .leetcode-btn {
+      background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%);
+      color: #000;
+      border: none;
+      padding: 16px 40px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 167, 38, 0.4);
+      margin-top: 10px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .leetcode-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 167, 38, 0.6);
+      background: linear-gradient(135deg, #ffb74d 0%, #ffa726 100%);
+    }
+    
+    .leetcode-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 10px rgba(255, 167, 38, 0.4);
+    }
+    
+    .divider {
+      width: 60%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #ff5252, transparent);
+      margin: 30px auto;
     }
   </style>
 </head>
 <body>
-  <div class="icon">⛔</div>
-  <h1>Access Blocked</h1>
-  <p>Your scheduled LinkedIn hour has expired <br/>(or hasn't started yet).</p>
-  <p>Go solve a LeetCode problem directly instead!</p>
+  <div class="container">
+    <div class="icon">⛔</div>
+    <h1>Access Blocked</h1>
+    <p class="message">Your LinkedIn access is currently restricted.</p>
+    <div class="divider"></div>
+    <p>Time to level up your coding skills!</p>
+    <button class="leetcode-btn" id="leetcodeBtn">
+      Open LeetCode
+    </button>
+  </div>
+  
+  <script src="blocked.js"></script>
 </body>
 </html>

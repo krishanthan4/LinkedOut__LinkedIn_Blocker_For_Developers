@@ -18,7 +18,7 @@ This extension enforces a "Code to Browse" policy.
 *   **Algo-Lock**: The core feature. Detected success on LeetCode triggers an unlock.
 *   **Time Windows**: Set a specific daily window where access is allowed (e.g., 6 PM - 7 PM).
 *   **Settings Lock**: Once you set your goals, the settings lock themselves. To change them, you have to solve a problem. No easy way out.
-*   **AI Grammar Helper**: A lightweight grammar checker integration for your messages and posts.
+*   **Grammar Helper**: A lightweight grammar checker integration for your messages and posts.
 
 ## Installation
 
