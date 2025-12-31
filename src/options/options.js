@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const usageModeRadios = document.getElementsByName('usageMode');
   const alwaysFocusCheck = document.getElementById('alwaysFocus');
   const apiUrlInput = document.getElementById('apiUrl');
-  const apiKeyInput = document.getElementById('apiKey');
   const saveBtn = document.getElementById('saveBtn');
   const statusMsg = document.getElementById('statusMessage');
   const timeBlockSettings = document.getElementById('timeBlockSettings');
@@ -67,8 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'allowedStartTime',
     'timeoutAction',
     'alwaysFocus',
-    'grammarApiUrl',
-    'grammarApiKey'
+    'grammarApiUrl'
   ], (data) => {
     // Set usage mode (default to timeBlock for backward compatibility)
     const usageMode = data.usageMode || 'timeBlock';
@@ -93,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (data.alwaysFocus) alwaysFocusCheck.checked = data.alwaysFocus;
     if (data.grammarApiUrl) apiUrlInput.value = data.grammarApiUrl;
-    if (data.grammarApiKey) apiKeyInput.value = data.grammarApiKey;
+    if (data.grammarApiUrl) apiUrlInput.value = data.grammarApiUrl;
 
     // Update UI based on loaded mode
     updateModeUI();
@@ -149,15 +147,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const alwaysFocus = alwaysFocusCheck.checked;
     const grammarApiUrl = apiUrlInput.value.trim();
-    const grammarApiKey = apiKeyInput.value.trim();
 
     chrome.storage.sync.set({
       usageMode: selectedMode,
       allowedStartTime: startTime,
       timeoutAction: timeoutAction,
       alwaysFocus: alwaysFocus,
-      grammarApiUrl: grammarApiUrl,
-      grammarApiKey: grammarApiKey
+      grammarApiUrl: grammarApiUrl
     }, () => {
       statusMsg.textContent = "Settings Saved Successfully!";
       setTimeout(() => statusMsg.textContent = "", 2000);
